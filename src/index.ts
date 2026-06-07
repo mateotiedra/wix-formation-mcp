@@ -5,7 +5,7 @@ import { runWithCredentials } from "./wix-context.js";
 
 const PORT = parseInt(process.env.PORT ?? "3000", 10);
 
-const app = createMcpExpressApp();
+const app = createMcpExpressApp({ host: "0.0.0.0" });
 const mcpServer = createServer();
 
 // Health check
