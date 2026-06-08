@@ -1,34 +1,46 @@
 import { createMcpExpressApp } from "@modelcontextprotocol/express";
 import { NodeStreamableHTTPServerTransport } from "@modelcontextprotocol/node";
+import { StdioServerTransport } from "@modelcontextprotocol/server";
 import { createServer } from "./mcp-server.js";
 import { runWithCredentials } from "./wix-context.js";
 
-const PORT = parseInt(process.env.PORT ?? "3000", 10);
+// ── Stdio mode ────────────────────────────────────────────────────────
 
-const app = createMcpExpressApp({ host: "0.0.0.0" });
-const mcpServer = createServer();
+if (process.argv.includes("--stdio")) {
+  const server = createServer();
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  // Process stays alive via stdio — no explicit listen needed.
+} else {
+  // ── HTTP mode ──────────────────────────────────────────────────────
 
-// Health check
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
-});
+  const PORT = parseInt(process.env.PORT ?? "3000", 10);
 
-// MCP Streamable HTTP endpoint
-app.post("/mcp", async (req, res) => {
-  const token = (req.headers["x-wix-api-token"] as string) ?? "";
-  const siteId = (req.headers["x-wix-site-id"] as string) ?? "";
+  const app = createMcpExpressApp({ host: "0.0.0.0" });
+  const mcpServer = createServer();
 
-  const transport = new NodeStreamableHTTPServerTransport({
-    sessionIdGenerator: undefined, // stateless — credentials per-request via headers
+  // Health check
+  app.get("/health", (_req, res) => {
+    res.json({ status: "ok" });
   });
 
-  await mcpServer.connect(transport);
+  // MCP Streamable HTTP endpoint
+  app.post("/mcp", async (req, res) => {
+    const token = (req.headers["x-wix-api-token"] as string) ?? "";
+    const siteId = (req.headers["x-wix-site-id"] as string) ?? "";
 
-  await runWithCredentials({ token, siteId }, async () => {
-    await transport.handleRequest(req, res, req.body);
+    const transport = new NodeStreamableHTTPServerTransport({
+      sessionIdGenerator: undefined, // stateless — credentials per-request via headers
+    });
+
+    await mcpServer.connect(transport);
+
+    await runWithCredentials({ token, siteId }, async () => {
+      await transport.handleRequest(req, res, req.body);
+    });
   });
-});
 
-app.listen(PORT, () => {
-  console.error(`Wix Bookings MCP server listening on port ${PORT}`);
-});
+  app.listen(PORT, () => {
+    console.error(`Wix Bookings MCP server listening on port ${PORT}`);
+  });
+}

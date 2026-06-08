@@ -4,6 +4,9 @@
   "description": "MCP server exposing Wix Bookings API tools for course management and participant lookup",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "wix-bookings-mcp": "dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
