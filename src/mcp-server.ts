@@ -25,10 +25,10 @@ export function createServer(): McpServer {
     version: "0.1.0",
   });
 
-  // ── wix_list_services ───────────────────────────────────────────────
+  // ── list_services ──────────────────────────────────────────────────
 
   server.registerTool(
-    "wix_list_services",
+    "list_services",
     {
       description:
         "Lister les services Wix Bookings (cours) de Physio 7. Retourne l'ID, le nom, le type, les dates, la capacité et le prix de chaque service. Utiliser cet outil pour obtenir les IDs nécessaires aux autres outils Wix, ou pour voir quels cours existent. Par défaut, seuls les services visibles sont retournés.",
@@ -42,10 +42,10 @@ export function createServer(): McpServer {
     },
   );
 
-  // ── wix_list_formations ─────────────────────────────────────────────
+  // ── list_formations ────────────────────────────────────────────────
 
   server.registerTool(
-    "wix_list_formations",
+    "list_formations",
     {
       description:
         "Lister les formations (cours) avec le nombre de participants dédupliqué, triées par date de début. Utiliser cet outil pour voir les formations à venir, leur disponibilité, ou le nombre d'inscrits. Par défaut, seules les formations à venir avec des réservations CONFIRMÉES sont incluses.",
@@ -59,13 +59,13 @@ export function createServer(): McpServer {
     },
   );
 
-  // ── wix_get_formation_participants ──────────────────────────────────
+  // ── get_formation_participants ─────────────────────────────────────
 
   server.registerTool(
-    "wix_get_formation_participants",
+    "get_formation_participants",
     {
       description:
-        "Obtenir la liste détaillée des participants d'un cours spécifique (noms, emails, statuts, options). Nécessite l'ID du service/cours obtenu via wix_list_services.",
+        "Obtenir la liste détaillée des participants d'un cours spécifique (noms, emails, statuts, options). Nécessite l'ID du service/cours obtenu via list_services.",
       inputSchema: getFormationParticipantsSchema,
     },
     async (params) => {
@@ -76,10 +76,10 @@ export function createServer(): McpServer {
     },
   );
 
-  // ── wix_search_bookings ─────────────────────────────────────────────
+  // ── search_bookings ─────────────────────────────────────────────────
 
   server.registerTool(
-    "wix_search_bookings",
+    "search_bookings",
     {
       description:
         "Rechercher des réservations par nom, email ou téléphone. Utiliser pour vérifier si une personne est inscrite, son statut, ou les détails de son cours. La recherche est insensible à la casse et couvre TOUTES les réservations (pas seulement à venir).",

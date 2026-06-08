@@ -6,33 +6,35 @@ Serveur MCP (Model Context Protocol) exposant les outils de l'API Wix Bookings p
 
 | Outil | Description |
 |-------|-------------|
-| `wix_list_services` | Lister les services Wix Bookings (cours). Retourne ID, nom, type, dates, capacité et prix. |
-| `wix_list_formations` | Lister les formations avec le nombre de participants dédupliqué, triées par date. |
-| `wix_get_formation_participants` | Obtenir la liste détaillée des participants d'un cours (noms, emails, statuts). |
-| `wix_search_bookings` | Rechercher des réservations par nom, email ou téléphone. |
+| `list_services` | Lister les services Wix Bookings (cours). Retourne ID, nom, type, dates, capacité et prix. |
+| `list_formations` | Lister les formations avec le nombre de participants dédupliqué, triées par date. |
+| `get_formation_participants` | Obtenir la liste détaillée des participants d'un cours (noms, emails, statuts). |
+| `search_bookings` | Rechercher des réservations par nom, email ou téléphone. |
 
 ## Identifiants
 
-Les identifiants Wix sont passés via les en-têtes HTTP à chaque requête :
+Les identifiants Wix sont passés de deux façons selon le mode :
 
-- `X-Wix-Api-Token` — Token d'API Wix
-- `X-Wix-Site-Id` — ID du site Wix
+- **Mode stdio** : via les variables d'environnement `WIX_API_TOKEN` et `WIX_SITE_ID`.
+- **Mode HTTP** : via les en-têtes HTTP `X-Wix-Api-Token` et `X-Wix-Site-Id`.
 
-## Déploiement (Docker)
+## Modes de transport
+
+### Stdio (par défaut avec `--stdio`)
 
 ```bash
-# Construire l'image
-docker build -t wix-bookings-mcp .
+WIX_API_TOKEN=xxx WIX_SITE_ID=yyy npx -y github:mateotiedra/wix-formation-mcp --stdio
+```
 
-# Lancer le serveur
+### HTTP
+
+```bash
 docker run -p 3000:3000 wix-bookings-mcp
 ```
 
 Le serveur écoute sur le port `3000` (configurable via `PORT`).
 
-### Configuration client MCP
-
-Exemple de configuration pour un client MCP (Claude Desktop, etc.) :
+Exemple de configuration client MCP (HTTP) :
 
 ```json
 {
@@ -54,7 +56,7 @@ Exemple de configuration pour un client MCP (Claude Desktop, etc.) :
 # Installer les dépendances
 npm install
 
-# Lancer en mode développement
+# Lancer en mode développement (HTTP)
 npm run dev
 
 # Compiler
