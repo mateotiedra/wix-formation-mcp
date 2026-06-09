@@ -26,7 +26,7 @@ export async function getFormationParticipants(
   participantCount: number;
   participants: ParticipantOutput[];
 }> {
-  const bookings = await client.fetchAllBookings(input.serviceId);
+  const bookings = (await client.fetchAllBookings()).filter(b => b.bookedEntity?.serviceId === input.serviceId);
   const confirmed = bookings.filter((b) => b.status === "CONFIRMED");
 
   if (confirmed.length === 0) {

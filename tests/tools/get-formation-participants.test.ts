@@ -23,6 +23,15 @@ describe("getFormationParticipants", () => {
           body: {
             bookings: [
               buildBooking({
+                bookedEntity: {
+                  title: "Formation A",
+                  serviceId: "svc-1",
+                  schedule: {
+                    firstSessionStart: "2026-06-15T09:00:00+0200",
+                    lastSessionEnd: "2026-06-16T17:00:00+0200",
+                    location: { name: "Paris" },
+                  },
+                },
                 contactDetails: {
                   contactId: "c1",
                   firstName: "Alice",
@@ -33,6 +42,15 @@ describe("getFormationParticipants", () => {
               }),
               buildBooking({
                 id: "b2",
+                bookedEntity: {
+                  title: "Formation A",
+                  serviceId: "svc-1",
+                  schedule: {
+                    firstSessionStart: "2026-06-15T09:00:00+0200",
+                    lastSessionEnd: "2026-06-16T17:00:00+0200",
+                    location: { name: "Paris" },
+                  },
+                },
                 contactDetails: {
                   contactId: "c2",
                   firstName: "Bob",
@@ -41,6 +59,14 @@ describe("getFormationParticipants", () => {
                   phone: "0602",
                 },
                 bookedAddOns: [{ name: "Déjeuner" }],
+              }),
+              // Booking for a different service — should be filtered out
+              buildBooking({
+                id: "b3",
+                status: "CONFIRMED",
+                bookedEntity: {
+                  serviceId: "svc-999",
+                },
               }),
             ],
             pagingMetadata: { hasNext: false },
@@ -90,22 +116,33 @@ describe("getFormationParticipants", () => {
     expect(result.title).toBe("?");
   });
 
-  it("passes serviceId to fetch call", async () => {
+  it("filters bookings client-side by bookedEntity.serviceId", async () => {
     fetchMock.mockImplementation(
       mockFetch([
         {
           status: 200,
-          body: { bookings: [], pagingMetadata: { hasNext: false } },
+          body: {
+            bookings: [
+              buildBooking({
+                id: "b1",
+                bookedEntity: { serviceId: "svc-42" },
+              }),
+              buildBooking({
+                id: "b2",
+                status: "CONFIRMED",
+                bookedEntity: { serviceId: "other-svc" },
+              }),
+            ],
+            pagingMetadata: { hasNext: false },
+          },
         },
       ]),
     );
 
     const client = new WixClient(testCredentials);
-    await getFormationParticipants(client, { serviceId: "svc-42" });
+    const result = await getFormationParticipants(client, { serviceId: "svc-42" });
 
-    const body = JSON.parse(
-      (fetchMock.mock.calls[0][1] as RequestInit).body as string,
-    );
-    expect(body.query.filter).toEqual({ serviceId: "svc-42" });
+    // Only the booking with matching serviceId should be included
+    expect(result.participantCount).toBe(1);
   });
 });
