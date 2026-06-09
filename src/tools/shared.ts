@@ -26,3 +26,26 @@ export function errMsg(err: unknown): string {
   if (err instanceof Error) return err.message;
   return String(err);
 }
+
+// ── Date helpers ────────────────────────────────────────────────────────
+
+export function parseDate(dateStr: string | undefined): Date | null {
+  if (!dateStr) return null;
+  const clean = dateStr.replace(/([+-]\d{2}):(\d{2})$/, "$1$2");
+  const d = new Date(clean);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+export function fmtDate(dateStr: string | undefined): string {
+  if (!dateStr) return "?";
+  return dateStr.slice(0, 10);
+}
+
+export function dateMatch(
+  aFirst: string | undefined,
+  aLast: string | undefined,
+  bFirst: string | undefined,
+  bLast: string | undefined,
+): boolean {
+  return fmtDate(aFirst) === fmtDate(bFirst) && fmtDate(aLast) === fmtDate(bLast);
+}

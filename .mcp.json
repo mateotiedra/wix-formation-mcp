@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "wix-bookings": {
+      "command": "node",
+      "args": ["--env-file", ".env", "dist/index.js", "--stdio"],
+      "cwd": "/home/daap/Codes/physio-7/wix-bookings-mcp/wix-bookings-mcp-0",
+      "directTools": true
+    }
+  }
+}

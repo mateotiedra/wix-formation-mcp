@@ -1,6 +1,7 @@
 import { z } from "zod/v4";
 import type { WixClient } from "../wix-client.js";
 import type { SearchResultOutput } from "../types.js";
+import { fmtDate } from "./shared.js";
 
 export const searchBookingsSchema = z.object({
   query: z
@@ -13,11 +14,6 @@ export const searchBookingsSchema = z.object({
 });
 
 export type SearchBookingsInput = z.infer<typeof searchBookingsSchema>;
-
-function fmtDate(dateStr: string | undefined): string {
-  if (!dateStr) return "?";
-  return dateStr.slice(0, 10);
-}
 
 export async function searchBookings(
   client: WixClient,

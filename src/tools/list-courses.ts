@@ -1,6 +1,7 @@
 import { z } from "zod/v4";
 import type { WixClient } from "../wix-client.js";
 import type { CourseOutput, WixBooking } from "../types.js";
+import { fmtDate, parseDate, dateMatch } from "./shared.js";
 
 export const listCoursesSchema = z.object({
   includeHidden: z
@@ -18,27 +19,6 @@ export const listCoursesSchema = z.object({
 });
 
 export type ListCoursesInput = z.infer<typeof listCoursesSchema>;
-
-function parseDate(dateStr: string | undefined): Date | null {
-  if (!dateStr) return null;
-  const clean = dateStr.replace(/([+-]\d{2}):(\d{2})$/, "$1$2");
-  const d = new Date(clean);
-  return isNaN(d.getTime()) ? null : d;
-}
-
-function fmtDate(dateStr: string | undefined): string {
-  if (!dateStr) return "?";
-  return dateStr.slice(0, 10);
-}
-
-function dateMatch(
-  aFirst: string | undefined,
-  aLast: string | undefined,
-  bFirst: string | undefined,
-  bLast: string | undefined,
-): boolean {
-  return fmtDate(aFirst) === fmtDate(bFirst) && fmtDate(aLast) === fmtDate(bLast);
-}
 
 export async function listCourses(
   client: WixClient,
