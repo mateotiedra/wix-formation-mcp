@@ -6,8 +6,7 @@ Serveur MCP (Model Context Protocol) exposant les outils de l'API Wix Bookings p
 
 | Outil | Description |
 |-------|-------------|
-| `list_services` | Lister les services Wix Bookings (cours). Retourne ID, nom, type, dates, capacité et prix. |
-| `list_formations` | Lister les formations avec le nombre de participants dédupliqué, triées par date. |
+| `list_courses` | Lister les cours/formations avec métadonnées (ID, nom, type, prix, capacité) et données d'inscription (lieu, nombre de participants). Utiliser pour découvrir les IDs nécessaires à `get_formation_participants`. |
 | `get_formation_participants` | Obtenir la liste détaillée des participants d'un cours (noms, emails, statuts). |
 | `search_bookings` | Rechercher des réservations par nom, email ou téléphone. |
 

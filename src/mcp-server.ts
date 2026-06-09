@@ -3,13 +3,9 @@ import { z } from "zod/v4";
 import { getCredentials } from "./wix-context.js";
 import { WixClient, WixApiError } from "./wix-client.js";
 import {
-  listServices,
-  listServicesSchema,
-} from "./tools/list-services.js";
-import {
-  listFormations,
-  listFormationsSchema,
-} from "./tools/list-formations.js";
+  listCourses,
+  listCoursesSchema,
+} from "./tools/list-courses.js";
 import {
   getFormationParticipants,
   getFormationParticipantsSchema,
@@ -25,36 +21,19 @@ export function createServer(): McpServer {
     version: "0.1.0",
   });
 
-  // ── list_services ──────────────────────────────────────────────────
+  // ── list_courses ───────────────────────────────────────────────────
 
   server.registerTool(
-    "list_services",
+    "list_courses",
     {
       description:
-        "Lister les services Wix Bookings (cours) de Physio 7. Retourne l'ID, le nom, le type, les dates, la capacité et le prix de chaque service. Utiliser cet outil pour obtenir les IDs nécessaires aux autres outils Wix, ou pour voir quels cours existent. Par défaut, seuls les services visibles sont retournés.",
-      inputSchema: listServicesSchema,
+        "Lister les cours/formations de Physio 7 avec leurs métadonnées (ID, nom, type, prix, capacité) et leurs données d'inscription (lieu, nombre de participants dédupliqué). Combiner cet outil avec get_formation_participants (qui nécessite l'ID du cours) pour obtenir la liste détaillée des participants. Par défaut, masque les services cachés, les formations passées, et les cours sans réservations.",
+      inputSchema: listCoursesSchema,
     },
     async (params) => {
       const creds = getCredentials();
       const client = new WixClient(creds);
-      const result = await listServices(client, params);
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    },
-  );
-
-  // ── list_formations ────────────────────────────────────────────────
-
-  server.registerTool(
-    "list_formations",
-    {
-      description:
-        "Lister les formations (cours) avec le nombre de participants dédupliqué, triées par date de début. Utiliser cet outil pour voir les formations à venir, leur disponibilité, ou le nombre d'inscrits. Par défaut, seules les formations à venir avec des réservations CONFIRMÉES sont incluses.",
-      inputSchema: listFormationsSchema,
-    },
-    async (params) => {
-      const creds = getCredentials();
-      const client = new WixClient(creds);
-      const result = await listFormations(client, params);
+      const result = await listCourses(client, params);
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     },
   );
@@ -65,7 +44,7 @@ export function createServer(): McpServer {
     "get_formation_participants",
     {
       description:
-        "Obtenir la liste détaillée des participants d'un cours spécifique (noms, emails, statuts, options). Nécessite l'ID du service/cours obtenu via list_services.",
+        "Obtenir la liste détaillée des participants d'un cours spécifique (noms, emails, statuts, options). Nécessite l'ID du service/cours obtenu via list_courses.",
       inputSchema: getFormationParticipantsSchema,
     },
     async (params) => {

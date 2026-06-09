@@ -36,6 +36,7 @@ export interface WixBooking {
   };
   bookedEntity: {
     title?: string;
+    serviceId?: string;
     schedule?: {
       scheduleId?: string;
       firstSessionStart?: string;
@@ -63,6 +64,20 @@ export interface ServiceOutput {
 export interface FormationOutput {
   scheduleId: string;
   title: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  participantCount: number;
+  rawCount: number;
+}
+
+export interface CourseOutput {
+  id: string;
+  name: string;
+  type: string;
+  hidden: boolean;
+  defaultCapacity: number;
+  price: string;
   location: string;
   startDate: string;
   endDate: string;
